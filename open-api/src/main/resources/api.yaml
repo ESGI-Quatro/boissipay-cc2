@@ -58,8 +58,8 @@ definitions:
       - "amount"
     properties:
       userId:
-        type: "integer"
-        format: "int64"
+        type: "string"
+        format: "string"
       amount:
         type: "number"
         format: "float64"

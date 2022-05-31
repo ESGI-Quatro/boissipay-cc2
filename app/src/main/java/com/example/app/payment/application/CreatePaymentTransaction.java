@@ -16,7 +16,7 @@ public final class CreatePaymentTransaction {
         this.repository = repository;
     }
 
-    void execute(String userId, double amount) {
+    public void execute(String userId, double amount) {
         var previousValue = cacheService.getValueByKey(userId);
         if(Objects.nonNull(previousValue)){
             String transactionId = paymentService.createTransaction();
