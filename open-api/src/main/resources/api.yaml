@@ -1,0 +1,83 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server Payment server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Payment CC2"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "payment.swagger.io"
+basePath: "/v2"
+tags:
+  - name: "payment"
+    description: "Process payment"
+    externalDocs:
+      description: "Find out more"
+      url: "http://swagger.io"
+schemes:
+  - "https"
+  - "http"
+paths:
+  /payment:
+    post:
+      tags:
+        - "payment"
+      summary: "Process transactional payment "
+      description: ""
+      operationId: "pay"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Generate a transaction based on an amount and a user id"
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentRequest"
+      responses:
+        "405":
+          description: "Invalid input"
+        "503":
+          description: "Gateway timeout"
+        "500":
+          description: "Servor error"
+        "200":
+          description: "Payment done"
+          schema:
+            $ref: "#/definitions/PaymentResponse"
+definitions:
+  PaymentRequest:
+    type: "object"
+    required:
+      - "userId"
+      - "amount"
+    properties:
+      userId:
+        type: "integer"
+        format: "int64"
+      amount:
+        type: "number"
+        format: "float64"
+  PaymentResponse:
+    type: "object"
+    properties:
+      transactionId:
+        type: "string"
+        format: "string"
+      status:
+        type: "string"
+        description: "Payment Status"
+        enum:
+          - "approved"
+          - "refused"
+          - "pending"
+          - "error"
+
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
