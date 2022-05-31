@@ -1,9 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.swagger</groupId>
     <artifactId>open-api</artifactId>
     <packaging>jar</packaging>
-    <name>swagger-spring</name>
     <version>1.0.0</version>
     <properties>
         <java.version>11</java.version>
@@ -30,8 +28,8 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <apiPackage>org.esgi.boissipay.api</apiPackage>
-                            <modelPackage>org.esgi.boissipay.model</modelPackage>
+                            <apiPackage>com.example.api</apiPackage>
+                            <modelPackage>com.example.model</modelPackage>
                             <inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
                             <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
 
