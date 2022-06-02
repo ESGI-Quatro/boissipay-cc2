@@ -11,21 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomPaymentApiDelegate implements PaymentApiDelegate {
+public final class CustomPaymentApiDelegate implements PaymentApiDelegate {
     @Override
     public ResponseEntity<PaymentResponse> pay(PaymentRequest body) {
+        PaymentResponse paymentResponse = new PaymentResponse();
         try {
             final CreatePaymentTransaction createPaymentTransaction = new CreatePaymentTransaction(new JedisCacheService(), new BoissiPaymentService(), new PaymentInMemoryRepository());
-            String transactionId = createPaymentTransaction.execute(body.getUserId(), body.getAmount().doubleValue());
-            PaymentResponse paymentResponse = new PaymentResponse();
+            final String transactionId = createPaymentTransaction.execute(body.getUserId(), body.getAmount().doubleValue());
             paymentResponse.transactionId(transactionId);
             paymentResponse.status(PaymentResponse.StatusEnum.APPROVED);
-
             return ResponseEntity.ok(paymentResponse);
         }catch (Exception e) {
-            PaymentResponse paymentResponse = new PaymentResponse();
-            paymentResponse.status(PaymentResponse.StatusEnum.ERROR);
-
+            paymentResponse.status(PaymentResponse.StatusEnum.REFUSED);
             return ResponseEntity.internalServerError().body(paymentResponse);
         }
 
