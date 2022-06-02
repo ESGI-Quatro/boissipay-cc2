@@ -3,7 +3,7 @@ package com.example.app.payment.infrastructure;
 import com.example.app.payment.domain.CacheService;
 import redis.clients.jedis.Jedis;
 
-public class JedisCacheService implements CacheService {
+public final class JedisCacheService implements CacheService {
     private final Jedis jedis;
 
     public JedisCacheService() {

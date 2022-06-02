@@ -2,7 +2,7 @@ package com.example.app.payment.domain;
 
 import java.util.Objects;
 
-public class Amount {
+public final class Amount {
 
     private final double value;
 
