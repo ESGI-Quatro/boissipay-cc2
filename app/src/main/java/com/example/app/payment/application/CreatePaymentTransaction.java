@@ -16,7 +16,7 @@ public final class CreatePaymentTransaction {
         this.repository = repository;
     }
 
-    public void execute(String userId, double amount) {
+    public String execute(String userId, double amount) {
         var previousValue = cacheService.getValueByKey(userId);
         if(!Objects.nonNull(previousValue)){
             String transactionId = paymentService.createTransaction();
@@ -24,6 +24,7 @@ public final class CreatePaymentTransaction {
             final Transaction transaction = new Transaction(new TransactionId(transactionId), new Amount(amount), new UserId(userId));
             repository.save(transaction);
             cacheService.deleteValueByKey(userId);
+            return transactionId;
         }else {
           throw new RuntimeException("transaction already processing");
         }

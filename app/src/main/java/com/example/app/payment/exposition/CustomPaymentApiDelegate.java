@@ -14,8 +14,20 @@ import org.springframework.stereotype.Service;
 public class CustomPaymentApiDelegate implements PaymentApiDelegate {
     @Override
     public ResponseEntity<PaymentResponse> pay(PaymentRequest body) {
-        final CreatePaymentTransaction createPaymentTransaction = new CreatePaymentTransaction(new JedisCacheService(), new BoissiPaymentService(), new PaymentInMemoryRepository());
-        createPaymentTransaction.execute(body.getUserId(), body.getAmount().doubleValue());
-        return PaymentApiDelegate.super.pay(body);
+        try {
+            final CreatePaymentTransaction createPaymentTransaction = new CreatePaymentTransaction(new JedisCacheService(), new BoissiPaymentService(), new PaymentInMemoryRepository());
+            String transactionId = createPaymentTransaction.execute(body.getUserId(), body.getAmount().doubleValue());
+            PaymentResponse paymentResponse = new PaymentResponse();
+            paymentResponse.transactionId(transactionId);
+            paymentResponse.status(PaymentResponse.StatusEnum.APPROVED);
+
+            return ResponseEntity.ok(paymentResponse);
+        }catch (Exception e) {
+            PaymentResponse paymentResponse = new PaymentResponse();
+            paymentResponse.status(PaymentResponse.StatusEnum.ERROR);
+
+            return ResponseEntity.internalServerError().body(paymentResponse);
+        }
+
     }
 }
