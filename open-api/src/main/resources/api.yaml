@@ -1,83 +1,815 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
-  description: "This is a sample server Payment server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
-  version: "1.0.0"
-  title: "Payment CC2"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "payment.swagger.io"
-basePath: "/v2"
-tags:
-  - name: "payment"
-    description: "Process payment"
-    externalDocs:
-      description: "Find out more"
-      url: "http://swagger.io"
-schemes:
-  - "https"
-  - "http"
+  version: 1.0.0
+  title: Travel Contract
+  description: The Travel Contract Application System
+servers:
+  - url: http://localhost:3006/refcontract/v1
 paths:
-  /payment:
-    post:
+  /contracts:
+    get:
+      operationId: searchContracts
       tags:
-        - "payment"
-      summary: "Process transactional payment "
-      description: ""
-      operationId: "pay"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
+        - Search/Read
+      summary: Search Contracts
+      description: >-
+        Multi-criteria search for contracts. The result is a list (maybe
+        empty) of contracts
+      security:
+        - OAuth2:
+            - read
+        - ApiKey: []
       parameters:
-        - in: "body"
-          name: "body"
-          description: "Generate a transaction based on an amount and a user id"
-          required: true
-          schema:
-            $ref: "#/definitions/PaymentRequest"
+        - $ref: '#/components/parameters/QuerySubscriberRef'
+        - $ref: '#/components/parameters/QueryContractStatus'
+        - $ref: '#/components/parameters/QueryPageLimit'
+        - $ref: '#/components/parameters/QueryPageOffset'
       responses:
-        "405":
-          description: "Invalid input"
-        "503":
-          description: "Gateway timeout"
-        "500":
-          description: "Servor error"
-        "200":
-          description: "Payment done"
-          schema:
-            $ref: "#/definitions/PaymentResponse"
-definitions:
-  PaymentRequest:
-    type: "object"
-    required:
-      - "userId"
-      - "amount"
-    properties:
-      userId:
-        type: "string"
-        format: "string"
-      amount:
-        type: "number"
-        format: "float64"
-  PaymentResponse:
-    type: "object"
-    properties:
-      transactionId:
-        type: "string"
-        format: "string"
-      status:
-        type: "string"
-        description: "Payment Status"
-        enum:
-          - "approved"
-          - "refused"
-          - "pending"
-          - "error"
+        '200':
+          description: SUCCESS - Returns a list of Contracts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsResponse'
+              examples:
+                ContractssResponse:
+                  $ref: '#/components/examples/ContractsResponse'
+        '401':
+          description: ERROR - Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '403':
+          description: ERROR - Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '500':
+          description: ERROR - Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+    post:
+      operationId: postContract
+      tags:
+        - Create/Lifecycle
+      summary: Add a Contract
+      description: Add a new Contract
+      security:
+        - OAuth2:
+            - write
+        - ApiKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+            examples:
+              ContractResponse:
+                $ref: '#/components/examples/ContractRequest'
+      responses:
+        '201':
+          description: SUCCESS - Contract created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+              examples:
+                ContractResponse:
+                  $ref: '#/components/examples/ContractResponse'
+        '400':
+          description: ERROR - Invalid object request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '401':
+          description: ERROR - Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '403':
+          description: ERROR - Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '500':
+          description: ERROR - Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+  /contracts/{contractRef}:
+    get:
+      operationId: getContract
+      tags:
+        - Search/Read
+      summary: Read a Contract
+      description: Get an existing Contract
+      security:
+        - OAuth2:
+            - write
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/PathContractRef'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+              examples:
+                ContractResponse:
+                  $ref: '#/components/examples/ContractResponse'
+        '401':
+          description: ERROR - Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '403':
+          description: ERROR - Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '500':
+          description: ERROR - Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+    patch:
+      operationId: patchContract
+      tags:
+        - Create/Lifecycle
+      summary: Patch a Contract
+      description: Update an existing Contract
+      security:
+        - OAuth2:
+            - write
+        - ApiKey: []
+      parameters:
+        - $ref: '#/components/parameters/PathContractRef'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractActionRequest'
+            examples:
+              ContractRequest:
+                $ref: '#/components/examples/ContractActionRequest'
+      responses:
+        '204':
+          description: NO_CONTENT
+        '400':
+          description: ERROR - Invalid object request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '401':
+          description: ERROR - Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '403':
+          description: ERROR - Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+        '500':
+          description: ERROR - Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ContractsResponse:
+                  $ref: '#/components/examples/ErrorResponse'
+ 
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      name: X-OKAPI-KEY
+      in: header
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://moncompte.esgi.fr/oauth/authorize
+          tokenUrl: https://moncompte/esgi.fr/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+  parameters:
+    PathContractRef:
+      name: contractRef
+      in: path
+      description: External identifier of the contract
+      required: true
+      example: CTR-671675563
+      schema:
+        type: string
+    PathCustomerRef:
+      name: customerRef
+      in: path
+      description: External reference of the subscriber
+      required: true
+      example: CUSTOMER NUMBER
+      schema:
+        type: string
+    QueryContractStatus:
+      name: contractStatus
+      in: query
+      description: Contract Status
+      example: ACTIVE
+      schema:
+        type: string
+    QueryContractRef:
+      name: contractRef
+      in: query
+      description: External identifier of the deferred billing contract for the customer
+      example: CTR-671675563
+      schema:
+        type: string
+    QuerySubscriberRef:
+      name: subscriberRef
+      in: query
+      description: External identifier of the subscriber
+      example: CUSTOMER NUMBER
+      schema:
+        type: string
+    QueryContactRef:
+      name: contactRef
+      in: query
+      description: IDExternal identifier of the Customer's contact
+      example: CTR-671675563
+      schema:
+        type: string
+    QueryPageLimit:
+      name: limit
+      in: query
+      description: Limits the number of items on a page
+      example: 10
+      schema:
+        type: integer
+    QueryPageOffset:
+      name: offset
+      in: query
+      description: Specifies the page number of the list to be displayed
+      example: 1
+      schema:
+        type: integer
+  schemas:
+    ErrorType:
+      type: object
+      required:
+        - path
+        - timestamp
+        - errorCode
+        - status
+      properties:
+        path:
+          type: string
+        timestamp:
+          type: integer
+        errorCode:
+          type: string
+        status:
+          type: integer
+        message:
+          type: string
+        detail:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorType'
+    BusinessAddress:
+      description: >
+        A postal address splitted in 6 lines ordered as defined in RNVP and
+        french standard AFNOR NF Z 10-011
 
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        ([more information about the
+        standards](http://www.rnvp-internationale.com/norme-postale/NF-Z-10-011.php)).
+
+        All the lines are mandatory. Lines that are optional may be empty.
+      type: object
+      properties:
+        line1:
+          description: |
+            Particular: CIVILITÉ - TITRE ou QUALITÉ - PRÉNOM - NOM
+            Progessionnal: RAISON SOCIALE ou DÉNOMINATION
+          type: string
+          example: ESGI SA
+        line2:
+          description: |
+            Particular: N°APP ou BAL - ÉTAGE - COULOIR - ESC
+            Professionnal: IDENTITÉ DU DESTINATAIRE et ou SERVICE
+          type: string
+          example: Service comptabilité
+        line3:
+          description: ENTRÉE - BÂTIMENT - IMMEUBLE - RÉS - ZI
+          type: string
+          example: null
+        line4:
+          description: NUMÉRO - LIBELLÉ DE LA VOIE
+          type: string
+        line5:
+          description: LIEU DIT ou SERVICE PARTICULIER DE DISTRIBUTION
+        locality:
+          description: Name of the locality of the address
+          type: string
+        countryCode:
+          description: >-
+            Country code as defined in standard ISO 3166 ([more information
+            about the
+            standard](https://www.iso.org/fr/iso-3166-country-codes.html))
+          type: string
+        countryName:
+          description: >-
+            Country name as defined in standard ISO 3166 ([more information
+            about the
+            standard](https://www.iso.org/fr/iso-3166-country-codes.html))
+          type: string
+    BusinessPerson:
+      type: object
+      required:
+        - ccuid
+        - lastName
+        - mail
+      properties:
+        ccui:
+          description: CCUI
+          example: CCU-123
+        gender:
+          description: Gender of the contact
+          type: string
+          enum:
+            - M
+            - MME
+          example: M
+        firstName:
+          description: First name of the contact
+          type: string
+          example: John
+        lastName:
+          description: Last name of the contact
+          type: string
+          example: DOE
+        mail:
+          description: Mail address of the contact
+          type: string
+          format: email
+          example: john.doe@acme.com
+        phone:
+          description: Phone number of the contact
+          type: string
+          format: phone
+          example: +33 (0)1 56 87 65 78
+
+
+    WireTransfertResource:
+      description: SEPA Informations
+      type: object
+      properties:
+        rum:
+          description: Référence Unique de Mandat
+          type: string
+          example: RUM08918098739762ABCGDF65524255658
+          
+    DeferredBilling:
+      description: Describe billing contract
+      type: object
+      properties:
+        creditLimit:
+          type: integer
+          example: 3000
+        payment:
+          $ref: '#/components/schemas/BusinessPayment'          
+
+    BusinessDistributor:
+      description: Describes distributor organisation & contact
+      type: object
+      properties:
+        disributorRef:
+          description: External reference of distributor
+          type: string
+          example: esgi SA
+        eFacturation:
+          description: Necessary for e-Invoicing & e-Reporting
+          type: object
+          properties:
+            siren:
+              type: string
+              example: '356000000'
+            tvaIntracommunautaire:
+              type: string
+              example: FR39356000000
+            country:
+              type: string
+              example: FRANCE
+        contactPerson:
+          $ref: '#/components/schemas/BusinessPerson'
+        contactAddress:
+          $ref: '#/components/schemas/BusinessAddress'
+    BusinessProfessionnalParty:
+      description: Describes professionnal organisation
+      type: object
+      properties:
+        professionnal:
+          description: Desribes professionnal party
+          type: object
+          properties:
+            customerId:
+              description: Internal Identifier of organisation
+              type: string
+              example: PRO-8996786873
+            customerRef:
+              description: External identifier of organisation (i.e. CUSTOMER)
+              type: string
+              example: CUSTOMER NUMBER
+    BusinessParticularParty:
+      description: Describes particular physical person
+      type: object
+      properties:
+        particular:
+          type: object
+          properties:
+            customerId:
+              description: Internal Identifier of person
+              type: string
+              example: PRO-8996786873
+            customerRef:
+              description: External identifier of organisation (i.e. firstName + lastName)
+              type: string
+              example: John DOE
+              
+    ContractActionRequest:
+      description: Describe contract action
+      type: object
+      properties:
+        action: 
+          type: string
+          example: activation
+        contractRef:
+          type: string
+    
+              
+    BusinessSubscriber:
+      description: Describes subscriber organisation & contact
+      type: object
+      required:
+        - subscriberType
+        - contactPerson
+        - contactAddress
+        - billingAddress
+      properties:
+        subscriberRef:
+          description: >-
+            External reference of subscriber (By example: social reason of the
+            company)
+          type: string
+          example: Ma Petite Entreprise
+        subscriberType:
+          type: string
+          enum:
+            - PARTICULAR
+            - PROFESSIONNAL
+          example: PROFESSIONNAL
+        party:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/BusinessProfessionnalParty'
+            - $ref: '#/components/schemas/BusinessParticularParty'
+        eInvoicing:
+          description: Necessary for e-Invoicing & e-Reporting
+          type: object
+          properties:
+            siren:
+              type: string
+              example: '784671695'
+            tvaIntracommunautaire:
+              type: string
+              example: FR53157896342
+            country:
+              type: string
+              example: FRANCE
+        contactPerson:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/BusinessPerson'
+            - type: object
+              required:
+                - contactId
+              properties:
+                contactId:
+                  description: Internal contact identifier (legal represenative of entity)
+                  type: string
+                  example: CCU-001524
+        contactAddress:
+          $ref: '#/components/schemas/BusinessAddress'
+        billingAddress:
+          $ref: '#/components/schemas/BusinessAddress'
+    BusinessPayment:
+      description: Describes the payment method used
+      type: object
+      required:
+        - paymentMethodType
+      properties:
+        paymentMethodType:
+          description: Payment method type (Only WIRETRANSFER for differed billing phase 1)
+          type: string
+          enum:
+            - WIRETRANSFER
+          example: WIRETRANSFER
+        wireTansfert:
+          $ref: '#/components/schemas/WireTransfertResource'
+    ContractRequest:
+      description: Describes contract
+      type: object
+      required:
+        - contractType
+        - createdAt
+        - activatedAt
+        - expireAt
+        - status
+        - distributor
+        - subscriber
+        - payment
+        - billing
+      properties:
+        productRef:
+          description: External reference of the product
+          type: string
+          enum:
+            - DEFERRED_BILLING
+          example: DEFERRED_BILLING        
+        contractType:
+          description: Type of contract
+          type: string
+          enum:
+            - DEFERRED_BILLING
+          example: DEFERRED_BILLING          
+        createdAt:
+          description: Creation date of contract (use ISO 8601 format YYYY-MM-DD)
+          type: string
+          format: date
+          example: '2022-04-22'
+        signedAt:
+          description: Signed date of contract (use ISO 8601 format YYYY-MM-DD)
+          type: string
+          format: date
+          example: '2022-04-22'          
+        activatedAt:
+          description: Activation date of contract (use ISO 8601 format YYYY-MM-DD)
+          type: string
+          format: date
+          example: '2022-04-24'
+        expireAt:
+          description: Expiration date of contract (use ISO 8601 format YYYY-MM-DD)
+          type: string
+          format: date
+          example: '2023-04-01'
+        status:
+          description: Status of contact
+          type: string
+          enum:
+            - CREATED
+            - ACTIVE
+            - SUSPENDED
+            - EXPIRED
+          example: ACTIVE
+        distributor:
+          $ref: '#/components/schemas/BusinessDistributor'
+        subscriber:
+          $ref: '#/components/schemas/BusinessSubscriber'
+        custom:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/DeferredBilling'
+          
+      example:
+        ContractResponse:
+          $ref: '#/components/examples/ContractResponse'
+    ContractResponse:
+      required:
+        - contractId
+        - contractRef
+      allOf:
+        - type: object
+          properties:
+            contractId:
+              description: Internal identifier of the contract
+              type: integer
+              example: 58761542
+            contractRef:
+              description: External identifier of the contract
+              type: string
+              example: SUB-YTYE65687
+        - $ref: '#/components/schemas/ContractRequest'
+      example:
+        ContractRequest:
+          $ref: '#/components/examples/ContractRequest'
+    ContractsResponse:
+      description: List of contracts that meet the search criteria
+      properties:
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractResponse'
+        metadata:
+          $ref: '#/components/schemas/QueryMetadataResponse'
+      example:
+        ContractsResponse:
+          $ref: '#/components/examples/ContractsResponse'
+    QueryMetadataResponse:
+      description: Informations on current query & count of items and pages
+      type: object
+      properties:
+        query:
+          description: URI of current query
+          type: string
+        countItems:
+          description: Number of items in current response
+          type: integer
+        totalItems:
+          description: Total number of items for current query
+          type: integer
+        totalPages:
+          description: Total number of pages for current query
+          type: integer
+  examples:
+    ErrorResponse:
+      value:
+        errors:
+          - path: /currentPath
+            timestamp: 2022-04-28-16T22:14:45.624+0000
+            errorCode: PD-123
+            status: 400|401|403|500
+            message: Error message
+    QueryMetadataResponse:
+      value:
+        query: /contracts?customerRef=CUSTOMER&status=ACTIVE
+        countItems: 1
+        totalItems: 1
+        totalPages: 1
+
+    ContractActionRequest:
+      value:
+        action: activation
+        contractRef: CTR-JHKJQGFSHFHGS
+
+
+    ContractRequest:
+      value:
+        productRef: DEFERRED_BILLING
+        contractType: DEFERRED_BILLING
+        createdAt: '2022-04-22'
+        signedAt: '2022-04-22'
+        activatedAt: '2022-04-24'
+        expireAt: '2023-04-01'
+        status: ACTIVE
+        distributor:
+          distributorRef: esgi SA
+        subscriber:
+          subscriberRef: MA PETITE ENTREPRISE 
+          subscriberType: PROFESSIONNAL
+          party:
+            customerId: PRO-8996786873
+            customerRef: CUSTOMER NUMBER
+          contactPerson:
+            gender: M
+            firstName: John
+            lastName: DOE
+            mail: john.doe@acme.com
+            phone: +33 (0)7 76 77 00 00
+        custom:
+          deferredBilling:
+            creditLimit: 3000
+            payment:
+                paymentMethodType: WIRETRANSFER
+                wireTansfert:
+                  rum : RUM08918098739762ABCGDF65524255658
+    ContractResponse:
+      value:
+        contractId: '786876725453'
+        contractRef: CTR-JHKJQGFSHFHGS
+        productRef: DEFERRED_BILLING
+        contractType: DEFERRED_BILLING
+        createdAt: '2022-04-22'
+        signedAt: '2022-04-22'
+        activatedAt: '2022-04-24'
+        expireAt: '2023-04-01'
+        status: ACTIVE
+        distributor:
+          distributorRef: esgi SA
+        subscriber:
+          subscriberRef: MA PETITE ENTREPRISE
+          subscriberType: PROFESSIONNAL
+          party:
+            customerId: PRO-8996786873
+            customerRef: CUSTOMER NUMBER
+          contactPerson:
+            ccuid: CCU-123
+            gender: M
+            firstName: John
+            lastName: DOE
+            mail: john.doe@acme.com
+            phone: +33 (0)7 76 77 00 00
+        custom:
+          deferredBilling:
+            creditLimit: 3000   
+            payment:
+              paymentMethodType: WIRETRANSFER
+              wireTansfert:
+                rum : RUM08918098739762ABCGDF65524255658
+    ContractsResponse:
+      value:
+        contracts:
+          - contractId: '786876725453'
+            contractRef: CTR-JHKJQGFSHFHGS
+            contractType: DEFERRED_BILLING
+            createdAt: '2022-04-22'
+            activatedAt: '2022-04-24'
+            expireAt: '2023-04-01'
+            status: ACTIVE
+            distributor:
+              distributorRef: esgi SA
+            subscriber:
+              subscriberRef: MA PETITE ENTREPRISE
+              subscriberType: PROFESSIONNAL
+              customerRef: CUSTOMER NUMBER
+              contactPerson:
+                ccuid: CCU-123
+                gender: M
+                firstName: John
+                lastName: DOE
+                mail: john.doe@acme.com
+                phone: +33 (0)7 76 77 00 00
+            custom:
+              deferredBilling:
+                creditLimit: 3000            
+                payment:
+                  paymentMethodType: WIRETRANSFER
+                  wireTansfert:
+                    rum : RUM08918098739762ABCGDF65524255658
+                  
+        metadata:
+          query: /contracts?customerRef=CUSTOMER&status=ACTIVE
+          countItems: 1
+          totalItems: 1
+          totalPages: 1

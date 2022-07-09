@@ -3,14 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.example</groupId>
-        <artifactId>boissipay-cc2</artifactId>
+        <groupId>org.example</groupId>
+        <artifactId>boissi-contract</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>app</name>
-    <description>app</description>
+    <artifactId>app1</artifactId>
+    <name>app1</name>
+    <description>app1</description>
     <properties>
         <java.version>11</java.version>
     </properties>

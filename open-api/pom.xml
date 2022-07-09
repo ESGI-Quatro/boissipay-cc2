@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>open-api</artifactId>
+    <artifactId>open-api1</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0</version>
     <properties>
@@ -9,8 +9,8 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
     <parent>
-        <groupId>com.example</groupId>
-        <artifactId>boissipay-cc2</artifactId>
+        <groupId>org.example</groupId>
+        <artifactId>boissi-contract</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <build>
@@ -20,7 +20,7 @@
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <!-- RELEASE_VERSION -->
-                <version>5.4.0</version>
+                <version>6.0.0</version>
                 <!-- /RELEASE_VERSION -->
                 <executions>
                     <execution>
